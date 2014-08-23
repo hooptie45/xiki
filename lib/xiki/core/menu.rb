@@ -1106,24 +1106,24 @@ module Xiki
     @@handlers_order = nil
     def self.handlers
       @@handlers ||= {
-        "*"=>[ConfLoadingHandler],   # This should always run
-        "conf"=>ConfHandler,   # This should always run
-        "rb"=>RubyHandler,
-        "menu"=>MenuHandler,
-        "deck"=>DeckHandler,
-        "steps"=>StepsHandler,
-        "notes"=>NotesHandler,
-        "html"=>HtmlHandler,
-        "markdown"=>MarkdownHandler,
-        "bootstrap"=>BootstrapHandler,
-        "txt"=>TxtHandler,
-        "py"=>PythonHandler,
-        "js"=>JavascriptHandler,
-        "coffee"=>CoffeeHandler,
-        "jpg"=>JpgHandler,
-        "pgn"=>PgnHandler,
-        "erb"=>ErbHandler,
-        "/"=>DirHandler,
+        "*"         => [::Xiki::Handlers::ConfLoadingHandler],   # This should always run
+        "conf"      => ::Xiki::Handlers::ConfHandler,   # This should always run
+        "rb"        => ::Xiki::Handlers::RubyHandler,
+        "menu"      => ::Xiki::Handlers::MenuHandler,
+        "deck"      => ::Xiki::Handlers::DeckHandler,
+        "steps"     => ::Xiki::Handlers::StepsHandler,
+        "notes"     => ::Xiki::Handlers::NotesHandler,
+        "html"      => ::Xiki::Handlers::HtmlHandler,
+        "markdown"  => ::Xiki::Handlers::MarkdownHandler,
+        "bootstrap" => ::Xiki::Handlers::BootstrapHandler,
+        "txt"       => ::Xiki::Handlers::TxtHandler,
+        "py"        => ::Xiki::Handlers::PythonHandler,
+        "js"        => ::Xiki::Handlers::JavascriptHandler,
+        "coffee"    => ::Xiki::Handlers::CoffeeHandler,
+        "jpg"       => ::Xiki::Handlers::JpgHandler,
+        "pgn"       => ::Xiki::Handlers::PgnHandler,
+        "erb"       => ::Xiki::Handlers::ErbHandler,
+        "/"         => ::Xiki::Handlers::DirHandler,
         }
     end
 
