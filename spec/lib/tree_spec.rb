@@ -43,6 +43,7 @@ describe Tree, "#traverse" do
 
   end
 
+
   it "leaves in comments" do
     paths = []
     tree = "
@@ -376,8 +377,8 @@ describe Tree, "#leaf" do
   end
 
   it "grabs siblings when pipe" do
-    mock(Line).value {"| bb"}
-    stub(Tree).siblings {["| aa", "| bb"]}
+    Line.stub(:value) {"| bb"}
+    Tree.stub(:siblings) {["| aa", "| bb"]}
     Tree.leaf("| bb").should == "aa\nbb\n"
   end
 
@@ -386,19 +387,21 @@ describe Tree, "#leaf" do
   end
 
   it "grabs siblings when slash after pipe" do
-    mock(Line).value {"| b/b"}
-    stub(Tree).siblings {["| aa", "| b/b"]}
+    Line.stub(:value) {"| b/b"}
+    Tree.stub(:siblings) {["| aa", "| b/b"]}
+
     Tree.leaf("| b/b").should == "aa\nb/b\n"
   end
 
   it "grabs siblings when slash pipe" do
-    mock(Line).value {"| bb / hey"}
-    stub(Tree).siblings {["| aa", "| bb / hey"]}
+    Line.stub(:value) {"| bb / hey"}    
+    Tree.stub(:siblings) {["| aa", "| bb / hey"]}
+
     Tree.leaf("| bb / hey").should == "aa\nbb / hey\n"
   end
-
+  
   it "uses line from path when slash pipe and not on the pipe line" do
-    mock(Line).value {"- red herring"}
+    Line.stub(:value){"- red herring"}
     Tree.leaf("aa/|b/b").should == "b/b"
   end
 end
@@ -1066,10 +1069,12 @@ end
 
 
 describe Tree, "#add_pluses_and_minuses" do
-
+  
   it "adds bullets" do
     txt = "aa\n  bb\n"
+    
     Tree.add_pluses_and_minuses(txt)
+
     txt.should == "+ aa\n  + bb\n"
   end
 
@@ -1081,110 +1086,94 @@ describe Tree, "#add_pluses_and_minuses" do
 
 end
 
+# require "active_support/all"
 
-describe Tree, "#construct_path" do
-  before :each do
-    $el = Object.new
-    stub($el).point.times(1) {100}
-  end
+# describe Tree, "#construct_path" do
+#   def sim(txt)
+#     io = StringIO.new(txt.strip_heredoc).each_line.map(&:chop).reverse.select(&:present?)
+#     st=false
+#     io.each do |l| 
+#       expect(Line).to receive(:value) {l}   unless st 
+#       st = true if l=~/@/
+#     end
+#   end
 
-  it "handles one line" do
-    # Simulates:
-    # a/
+#   let(:el) { double(:emacs_env, :point =>100, :search_backward_regexp => anything, :goto_char => nil) }
 
-    mock(Line).value.times(1) {"a/"}
-    mock($el).goto_char(100)
+#   before do 
+#     $el = el
+#   end
 
-    Tree.construct_path.should == "a/"
-  end
+#   it "handles one line" do
+#     sim <<-TREE
+#       a/
+#     TREE
 
-  it "handles nesting one level" do
-    # Simulates:
-    # a/
-    #   b/
+#     Tree.construct_path.should == "a/"
+#   end
 
-    mock(Line).value.times(1) {"  b/"}
-    mock(Line).value.times(1) {"a/"}
-    mock($el).search_backward_regexp(anything)
+#   it "handles nesting one level" do
+#     sim <<-TREE
+#     a/
+#       b/
+#     TREE
+  
+#     Tree.construct_path.should == "a/b/"
+#   end
 
-    mock($el).goto_char(100)
-    Tree.construct_path.should == "a/b/"
-  end
+#   it "stops when stop sign" do
+#     sim <<-TREE    
+#     a/
+#       @b/
+#     TREE
 
-  it "stops when stop sign" do
-    # Simulates:
-    # a/
-    #   @b/
+#     Tree.construct_path.should == "b/"
+#   end
 
-    mock(Line).value.times(1) {"  @b/"}
-    mock($el).goto_char(100)
-    Tree.construct_path.should == "b/"
-  end
+#   it "returns list" do
+#     sim <<-TREE    
+#     a/
+#       b/
+#     TREE
+#     Tree.construct_path(:list=>1).should == ["a/", "b/"]
+#   end
 
-  it "returns list" do
-    # Simulates:
-    # a/
-    #   b/
+#   it "returns a list when stop" do
+#     sim <<-TREE    
+#     a/
+#       @b/
+#     TREE
+#     Tree.construct_path(:all=>1, :list=>1).should == ["a/", "@b/"]
+#   end
 
-    mock(Line).value.times(1) {"  b/"}
-    mock(Line).value.times(1) {"a/"}
-    mock($el).search_backward_regexp(anything)
+#   it "handles when stop, slashes and list" do
+#     sim <<-TREE    
+#     a/
+#       @b/
+#     TREE
+#     Tree.construct_path(:all=>1, :slashes=>1).should == "a/@b/"
+#   end
 
-    mock($el).goto_char(100)
-    Tree.construct_path(:list=>1).should == ["a/", "b/"]
-  end
+#   xit "leaves double slashes" do
+#     sim <<-TREE    
+#     a//
+#       @b/
+#     TREE
+   
+#     Tree.construct_path(:all=>1, :slashes=>1).should == "a//@b/"
+#   end
 
-  it "returns a list when stop" do
-    # Simulates:
-    # a/
-    #   @b/
-
-    mock(Line).value.times(1) {"  @b/"}
-    mock($el).search_backward_regexp(anything)
-    mock(Line).value.times(1) {"a/"}
-    mock($el).goto_char(100)
-
-    Tree.construct_path(:all=>1, :list=>1).should == ["a/", "@b/"]
-  end
-
-  it "handles when stop, slashes and list" do
-    # Simulates:
-    # a/
-    #   @b/
-
-    mock(Line).value.times(1) {"  @b/"}
-    mock($el).search_backward_regexp(anything)
-    mock(Line).value.times(1) {"a/"}
-    mock($el).goto_char(100)
-
-    Tree.construct_path(:all=>1, :slashes=>1).should == "a/@b/"
-  end
-
-  it "leaves double slashes" do
-    # What should it return when this?...
-    # a//
-    #   @b/
-
-    mock(Line).value.times(1) {"  @b/"}
-    mock($el).search_backward_regexp(anything)
-    mock(Line).value.times(1) {"a//"}
-    mock($el).goto_char(100)
-
-    Tree.construct_path(:all=>1, :slashes=>1).should == "a//@b/"
-
-  end
-
-  it "returns new raw format that menus can get via yield" do
-    $el.point
-    pending "Don't know what it should look like"
+#   xit "returns new raw format that menus can get via yield" do
+#     $el.point
+#     pending "Don't know what it should look like"
 
 
-    # What should it return when this?...
-    # a/
-    #   b/@c/
-    #     d/
-  end
-end
+#     # What should it return when this?...
+#     # a/
+#     #   b/@c/
+#     #     d/
+#   end
+# end
 
 describe Tree, "#join_to_subpaths" do
   it "leaves list boundaries only for at signs" do

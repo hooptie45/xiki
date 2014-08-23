@@ -1,12 +1,12 @@
-$:.unshift "spec/"
-require './spec/spec_helper'
+require 'spec_helper'
 require 'json'
 
 %w"path tree".each {|o| require "xiki/core/#{o}"}
 # %w"path code tree menu menu_suggester pre_pattern pattern file_tree bookmarks".each {|o| require "xiki/core/#{o}"}
 
-require_relative '../menu/memorize.rb'
+require_relative '../../menu/memorize.rb'
 
+describe Memorize,:pending => true do
 # describe Memorize, "#expand" do
 describe Memorize, "#propagate_edits" do
   it "updates when just question" do
@@ -44,4 +44,5 @@ Ol.a txt
     o.completed.length.should == 3
     o.progress.should == [[3, 1, 2], []]
   end
+end
 end

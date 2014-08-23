@@ -4,7 +4,7 @@ require './spec/spec_helper'
 require 'xiki/core/tree'
 require 'xiki/core/rest_tree'
 
-describe RestTree, "#comment_embedded_menu" do
+describe RestTree, "#comment_embedded_menu", :pending => true do
 
   it "returns unaltered when no comment" do
     RestTree.comment_embedded_menu("foo", "foo").should == nil
