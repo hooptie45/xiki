@@ -1,11 +1,19 @@
 require 'rr'
 require 'awesome_print'
+require 'rspec'
+require 'xiki'
+
+path = "#{File.expand_path('..', __FILE__)}/support/**/*.rb"
+Dir[path].each { |f| require f }
 
 %w"xiki/core/core_ext xiki/core/ol".each {|o| require o}
 
-# RSpec::Runner.configure do |config|
 RSpec.configure do |config|
-  config.mock_with :rr
+  # Use color in STDOUT
+  config.color = true
+
+  # Use the specified formatter
+  config.formatter = :progress
 end
 
 module Xiki
@@ -18,7 +26,7 @@ def stub_menu_path_dirs
   xiki_dir = Xiki.dir
 
   list = ["#{xiki_dir}spec/fixtures/menu", "#{xiki_dir}menu"]
-  stub(Xiki).menu_path_dirs {list}
+  Xiki.stub(:menu_path_dirs) {list}
 end
 
 
